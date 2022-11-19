@@ -1,40 +1,78 @@
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-    <title>Financial Data</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.css" />
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>Financial Data</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.css" />
 </head>
 
 
 <body>
-    <nav class="navbar hero is-dark is-bold has-text-centered" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <a class="navbar-item">
-                <h1 class="title has-text-weight-normal is-1 has-text-white">
-                    Django-Bokeh-AlphaVantage
-                </h1>
-            </a>
-        </div>
-    </nav>
-    <section class="container">
-        <div class="columns">
-            <div class="column">
+	<nav class="navbar hero is-dark is-bold has-text-centered" role="navigation" aria-label="main navigation">
+		<div class="navbar-brand">
+			<a class="navbar-item">
+				<h1 class="title has-text-weight-normal is-1 has-text-white">
+					Crypto Stock Market
+				</h1>
+			</a>
+		</div>
+	</nav>
+	<section class="container">
+		<div class="columns">
+			<div class="column is-4">
 
-            </div>
-            <div class="column is-6">
-                {{ div | safe }}
-            </div>
-            <div class="column">
-
-            </div>
-        </div>
-    </section>
+			</div>
+			<div class="column">
+				<!-- <div w3-include-html="figure.html"></div> -->
+				{{ fig |safe }}
+			</div>
+		</div>
+	</section>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/1.4.0/bokeh.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/1.4.0/bokeh-widgets.min.js"></script>
-    {{ script | safe }}
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/1.4.0/bokeh.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/1.4.0/bokeh-widgets.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+		integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+	</script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+		integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+	</script>
+    <script>
+        function includeHTML() {
+            var z, i, elmnt, file, xhttp;
+            /* Loop through a collection of all HTML elements: */
+            z = document.getElementsByTagName("*");
+            for (i = 0; i < z.length; i++) {
+                elmnt = z[i];
+                /*search for elements with a certain atrribute:*/
+                file = elmnt.getAttribute("w3-include-html");
+                if (file) {
+                /* Make an HTTP request using the attribute value as the file name: */
+                xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4) {
+                    if (this.status == 200) {elmnt.innerHTML = this.responseText;}
+                    if (this.status == 404) {elmnt.innerHTML = "Page not found.";}
+                    /* Remove the attribute, and call this function once more: */
+                    elmnt.removeAttribute("w3-include-html");
+                    includeHTML();
+                    }
+                }
+                xhttp.open("GET", file, true);
+                xhttp.send();
+                /* Exit the function: */
+                return;
+                }
+            }
+        }
+        includeHTML()
+    </script>
+	{{ script | safe }}
 </body>
 
 </html>
