@@ -1,10 +1,11 @@
 from django.shortcuts import render
-from bokeh.plotting import figure, output_file, show
-from bokeh.embed import components
+#from bokeh.plotting import figure, output_file, show
+#from bokeh.embed import components
 import pandas as pd
 from math import pi
 import datetime
 from .utils import get_data, convert_to_df
+import plotly.graph_objs as go 
 
 # Create your views here.
 def homepage(request):
@@ -18,31 +19,32 @@ def homepage(request):
     increasing = result_df.close > result_df.open
     decreasing = result_df.close > result_df.open
 
-    # 30 mins 
-    w = 12 * 60 * 60 * 1000
+    # Declare plotly figure (go)
+    fig=go.Figure()
 
-    # Setup graph with bokeh
-    TOOLS = "pan, wheel_zoom, box_zoom, reset, save"
+    fig.add_trace(go.Candlestick(x=result_df.index,
+                    open=result_df['open'],
+                    high=result_df['high'],
+                    low=result_df['low'],
+                    close=result_df['close'], name = 'market data'))
 
-    title = 'BTC to USD chart'
+    fig.update_layout(
+        title= 'BTC/USD',
+        yaxis_title='Price')               
 
-    p = figure(x_axis_type="datetime", tools=TOOLS, width=700, height=500, title = title)
-    p.xaxis.major_label_orientation = pi / 4
-
-    p.grid.grid_line_alpha = 0.3
-
-    p.segment(result_df.index, result_df.high, result_df.index, result_df.low, color="black")
-
-    # Set up colours
-    p.vbar(result_df.index[increasing], w, result_df.open[increasing], result_df.close[increasing],
-        fill_color="#D5E1DD", line_color="black"
+    fig.update_xaxes(
+        rangeslider_visible=True,
+        rangeselector=dict(
+            buttons=list([
+                dict(count=15, label="15m", step="minute", stepmode="backward"),
+                dict(count=45, label="45m", step="minute", stepmode="backward"),
+                dict(count=1, label="HTD", step="hour", stepmode="todate"),
+                dict(count=3, label="3h", step="hour", stepmode="backward"),
+                dict(step="all")
+            ])
+        )
     )
-    p.vbar(result_df.index[decreasing], w, result_df.open[decreasing], result_df.close[decreasing], 
-        fill_color="#F2583E", line_color="black"
-    )
 
-    script, div = components(p)
+    script, div = components(fig)
 
     return render(request,'pages/base.html',{'script':script, 'div':div })
-
-
