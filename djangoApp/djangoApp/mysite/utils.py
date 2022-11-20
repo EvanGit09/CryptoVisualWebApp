@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import json
+import datetime
 
 from binance.client import Client
 
@@ -28,7 +29,8 @@ def convert_to_df(data):
 
     #change to datetime
 
-    df['date_formatted'] = pd.to_datetime(df['date'], origin='2017-09-01')
+    #df['date_formatted'] = pd.to_datetime(df['date'], origin='2009-01-09')
+    df['date_formatted'] = [datetime.datetime.fromtimestamp(int(i)/1000) for i in df['date']]
 
     #sort data according to date
 
@@ -66,11 +68,15 @@ def get_data(from_symbol='BTC', to_symbol='USDT', rate='30m'):
     symbol = from_symbol + to_symbol
 
     # get timestamp of earliest date data is available
-    timestamp = client._get_earliest_valid_timestamp(symbol, '1d')
+    #timestamp = client._get_earliest_valid_timestamp(symbol, rate)
+
     #print(timestamp)
 
+    # get current time
+    currTime = datetime.datetime.now()
+
     # request historical candle (or klines) data
-    bars = client.get_historical_klines('BTCUSDT', '1d', timestamp, limit=1000)
+    bars = client.get_historical_klines('BTCUSDT', rate, str(currTime - datetime.timedelta(30)), str(currTime), limit=1000)
 
     # Return the json data
     return bars

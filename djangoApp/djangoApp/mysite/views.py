@@ -5,13 +5,13 @@ import pandas as pd
 from math import pi
 import datetime
 from .utils import get_data, convert_to_df
-import plotly.graph_objs as go 
+import plotly.graph_objs as go
 
 # Create your views here.
 def homepage(request):
 
     # Use utils.py to get the data
-    result = get_data('BTC', 'USDT', rate='1d')
+    result = get_data('BTC', 'USDT', rate='15m')
 
     result_df = convert_to_df(result)
 
