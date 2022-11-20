@@ -2,11 +2,15 @@ import requests
 import pandas as pd
 import json
 import datetime
+import time
 
 from binance.client import Client
+from binance import ThreadedWebsocketManager
 
 api_key = "7Y76Gcu8fSXBfwYwYLRflQG4ifzDVim5G09SiMAxcxRQWtCPuO4XGOivuqB8BeQ7"
 api_secret = "DaMfF3glGm2jc2OuMyi8azdi4el8krv2N2XohaAi1qqG2DISgPpSKiv3WEB2o6UH"
+
+price = {'BTCUSDT': pd.DataFrame(columns=['date', 'price']), 'error': False}
 
 def convert_to_df(data):
     """Convert the result JSON in pandas dataframe"""
@@ -80,6 +84,61 @@ def get_data(from_symbol='BTC', to_symbol='USDT', rate='30m'):
 
     # Return the json data
     return bars
+
+def btc_pairs_trade(msg):
+    ''' define how to process incoming WebSocket messages '''
+    if msg['e'] != 'error':
+        price['BTCUSDT'].loc[len(price['BTCUSDT'])] = [pd.Timestamp.now(), float(msg['c'])]
+    else:
+        price['error'] = True
+
+def get_live_data():
+    client = Client(api_key, api_secret)
+
+    # init and start the WebSocket
+    bsm = ThreadedWebsocketManager()
+    bsm.start()
+    bsm.start_symbol_ticker_socket(symbol='BTCUSDT', callback=btc_pairs_trade)
+
+    ## main
+    while len(price['BTCUSDT']) == 0:
+        # wait for WebSocket to start streaming data
+        time.sleep(0.1)
+	
+    time.sleep(300)
+
+    while True:
+        # error check to make sure WebSocket is working
+        if price['error']:
+            # stop and restart socket
+            bsm.stop()
+            time.sleep(2)
+            bsm.start()
+            price['error'] = False
+        else:
+            df = price['BTCUSDT']
+            start_time = df.date.iloc[-1] - pd.Timedelta(minutes=5)
+            df = df.loc[df.date >= start_time]
+            max_price = df.price.max()
+            min_price = df.price.min()
+            if df.price.iloc[-1] < max_price * 0.95:
+                try:
+                    order = client.futures_create_order(symbol='ETHUSDT', side='SELL', type='MARKET', quantity=100)
+                    break
+                except Exception as e:
+                    print(e)
+
+            elif df.price.iloc[-1] > min_price * 1.05:
+                try:
+                    order = client.futures_create_order(symbol='ETHUSDT', side='BUY', type='MARKET', quantity=100)
+                    break
+                except Exception as e:
+                    print(e)
+
+        time.sleep(0.1)
+
+    # properly stop and terminate WebSocket
+    bsm.stop()
 
 '''if __name__ == "__main__":
     data = get_data()
