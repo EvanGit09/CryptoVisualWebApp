@@ -7,6 +7,7 @@ import datetime
 from .utils import get_data, convert_to_df
 import plotly.graph_objs as go
 import time
+import plotly.express as px
 
 # Create your views here.
 def homepage(request):
@@ -89,4 +90,54 @@ def homepage(request):
 
 def liveprice(request):
 
-    return render(request, 'pages/base.html')
+    # main loop
+    while True:
+
+        # Use utils.py to get the data
+        result = get_data('BTC', 'USDT', rate='1m')
+
+        result_df = convert_to_df(result)
+        print(result_df)
+
+        fig2 = px.line(result_df, x='date_formatted', y='close', title='Line Graph of Price')
+
+        #date      open      high       low     close        volume      date_formatted
+
+
+        #fig.write_html('./mysite/templates/mysite/pages/figure.html')
+
+        fig2.write_html('./mysite/templates/mysite/pages/figure2.html')
+
+        fig2_file = open('./mysite/templates/mysite/pages/figure2.html', 'r')
+
+        fig2_html = fig2_file.read()
+
+        fig2_file.close()
+
+        #print(fig_html)
+
+        '''w = 12 * 60 * 60 * 1000
+        #print(result_df)
+        TOOLS = "pan, wheel_zoom, box_zoom, reset, save"
+
+        title = 'EUR to USD chart'
+
+        #p = figure(x_axis_type="datetime", tools=TOOLS, plot_width=700, plot_height=500, title = title)
+        p = figure(x_axis_type="datetime", tools=TOOLS, width=700, height=500, title = title)
+        p.xaxis.major_label_orientation = pi / 4
+        
+        p.grid.grid_line_alpha = 0.3
+        
+        p.segment(result_df.date_formatted, result_df.high, result_df.date_formatted, result_df.low, color="black")
+        p.vbar(result_df.date_formatted[increasing], w, result_df.open[increasing], result_df.close[increasing],
+            fill_color="#D5E1DD", line_color="black"
+        )
+        p.vbar(result_df.date_formatted[decreasing], w, result_df.open[decreasing], result_df.close[decreasing], 
+            fill_color="#F2583E", line_color="black"
+        )
+
+        script, div = components(p)'''
+        
+
+        #return render(request,'pages/base.html',{'script':script, 'div':div })
+        return render(request,'pages/base.html',context={'fig':fig2_html })
