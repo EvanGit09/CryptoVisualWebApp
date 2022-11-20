@@ -87,4 +87,6 @@ def homepage(request):
         #return render(request,'pages/base.html',{'script':script, 'div':div })
         return render(request,'pages/base.html',context={'fig':fig_html })
 
-        time.sleep(1)
+def liveprice(request):
+
+    return render(request, 'pages/base.html')
