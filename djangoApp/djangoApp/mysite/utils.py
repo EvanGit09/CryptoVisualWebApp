@@ -76,7 +76,7 @@ def get_data(from_symbol='BTC', to_symbol='USDT', rate='30m'):
     currTime = datetime.datetime.now()
 
     # request historical candle (or klines) data
-    bars = client.get_historical_klines('BTCUSDT', rate, str(currTime - datetime.timedelta(30)), str(currTime), limit=1000)
+    bars = client.get_historical_klines('BTCUSDT', rate, str(currTime - datetime.timedelta(1)), str(currTime), limit=1000)
 
     # Return the json data
     return bars
